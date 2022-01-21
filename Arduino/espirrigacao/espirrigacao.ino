@@ -13,9 +13,10 @@
 // definitions
 #define DHTPIN 4
 #define DHTTYPE DHT11
+//#define WATERPIN 12
 #define FIREBASE_ID "espwater-25fb5-default-rtdb"
 #define FIREBASE_FINGERPRINT "93 49 BD 13 3F AD AE EB 44 9B DA EA 6E 7F 27 A3 2E D1 73 7B"
-#define PUBLISH_INTERVAL 1000*60*60
+#define PUBLISH_INTERVAL 1000 * 60 * 5
 
 // initializations
 ESP8266WebServer server(80);
@@ -34,7 +35,10 @@ void setup()
 {
   Serial.begin(115200);
   Serial.println("BEGIN");
+  //pinMode(WATERPIN, INPUT);
   delay(50);
+
+  //wifiManager.resetSettings();
 
   wifiManager.setSaveConfigCallback(saveConfigCallback);
   wifiManager.autoConnect();
@@ -52,9 +56,11 @@ void loop()
   if (firebasePath.length() > 0 && WiFi.status() == WL_CONNECTED && publishNewState) {
     float temperature = dht.readTemperature();
     float humidity = dht.readHumidity();
+    //float water = analogRead(WATERPIN);
 
-    firebase.setString(firebasePath+"temperature/", String(temperature));
-    firebase.setString(firebasePath+"humidity/", String(humidity));
+    firebase.setString(firebasePath+"sensors/temperature/", String(temperature));
+    firebase.setString(firebasePath+"sensors/humidity/", String(humidity));
+    //firebase.setString(firebasePath+"sensors/water/", String(water));
 
     publishNewState = false;
   }
